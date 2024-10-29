@@ -24,3 +24,4 @@ This project approaches to a genetic algorithm, specifically a simple String App
 
 1. RawKernel to Cupy API Code
 2. Cleaning code
+3. Benchmark
