@@ -1,0 +1,19 @@
+python ./benchmark.py 8 16 128 1024
+CPU : 0.4972s
+GPU : 0.2267s
+
+python ./benchmark.py 16 16 128 1024
+CPU : 1.1540s
+GPU : 0.5704s
+
+python ./benchmark.py 32 16 128 1024
+CPU : 3.9948s
+GPU : 1.2608s
+
+python ./benchmark.py 64 16 128 1024
+CPU : 11.4446s
+GPU : 2.5063s
+
+python ./benchmark.py 128 16 128 1024
+CPU : 53.7115s
+GPU : 5.1431s
