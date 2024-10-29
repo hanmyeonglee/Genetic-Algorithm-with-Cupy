@@ -42,7 +42,7 @@ def crossover(indices, generation):
     mask2 = cp.arange(0, targets.shape[-1], dtype=cp.uint32) >= x_points[:, None]
     return cp.where(mask1, targets[:, 0], 0) + cp.where(mask2, targets[:, 1], 0)
 
-def mutation(generation, propability):
+def mutation(generation, propability, target):
     mask = cp.random.random(size=generation.shape[0]) < propability
     rows = cp.arange(generation.shape[0])[mask]
     cols = cp.argmax(cp.abs(generation - target), axis=-1)[mask]
@@ -53,7 +53,7 @@ def sort_generation(fitnesses, n_parents):
     return cp.argsort(fitnesses)[:n_parents]
 
 def make_offsprings(
-        generation, fitnesses,
+        generation, fitnesses, target,
         gen_size, probability, n_parents
     ):
 
@@ -62,36 +62,39 @@ def make_offsprings(
 
     parents_indices = selection(roulette, gen_size - n_parents)
     offspring = crossover(parents_indices, generation)
-    mutation(offspring, probability)
+    mutation(offspring, probability, target)
     return cp.concatenate((generation[sorted_indices], offspring))
 
 def get_best_score(generation):
     return cp.min(get_fitness(generation))
 
+def gpu_main(string, gen_size, ggap, mutation_probability):
+    best_fitness = 99999
 
-best_fitness = 99999
+    n_parents = int(gen_size * (1 - ggap))
 
-gen_size = 128
-ggap = 0.8
-n_parents = int(gen_size * (1 - ggap))
-mutation_probability = 0.03
-
-target = cp.array(list(map(ord, input('String Approximation : '))), dtype=cp.int16)
-len_chromo = len(target)
+    target = cp.array(list(map(ord, string)), dtype=cp.int16)
+    len_chromo = len(target)
 
 
-generation = cp.random.randint(0, 255, size=(gen_size, len_chromo), dtype=cp.int16)
-fitnesses = get_fitness(generation, target)
+    generation = cp.random.randint(0, 255, size=(gen_size, len_chromo), dtype=cp.int16)
+    fitnesses = get_fitness(generation, target)
 
-while best_fitness > 0:
-    generation = make_offsprings(
-        generation, fitnesses,
-        gen_size, mutation_probability, n_parents
+    while best_fitness > 0:
+        generation = make_offsprings(
+            generation, fitnesses, target,
+            gen_size, mutation_probability, n_parents
+        )
+
+        fitnesses = get_fitness(generation, target)
+        best_fitness = cp.min(fitnesses)
+
+if __name__ == "__main__":
+    gpu_main(
+        string=input('String Approximation : '),
+        gen_size=128,
+        ggap=0.8,
+        mutation_probability=0.05,
     )
 
-    fitnesses = get_fitness(generation, target)
-    best_fitness = cp.min(fitnesses)
-
-result = generation[cp.argmin(fitnesses)].get()
-print('result:', ''.join(map(chr, result)))
-print('Algorithm Ended!')
+    print('Algorithm Ended!')

@@ -19,9 +19,16 @@ This project approaches to a genetic algorithm, specifically a simple String App
 ### Installation Guide for Cupy
 - <https://docs.cupy.dev/en/stable/install.html>
 
+## Run
+
+### Genetic Algorithm
+- `python ./Genetic_Algorithm_GPU.py`
+
+### Benchmark
+- `python ./benchmark.py <string_length> <iter_num>`
+
 ## TODO
 **This project is not completed.**
 
 1. RawKernel to Cupy API Code
 2. Cleaning code
-3. Benchmark
